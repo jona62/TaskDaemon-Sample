@@ -24,6 +24,7 @@ services:
       - DAEMON_WORKERS=4
     depends_on:
       - handler-build
+      - wordcount-build
 
   handler-build:
     build:
@@ -31,3 +32,10 @@ services:
       dockerfile: handlers/Dockerfile
     image: image-handler:latest
     command: ["echo", "Handler image built"]
+
+  wordcount-build:
+    build:
+      context: ./handlers
+      dockerfile: Dockerfile.wordcount
+    image: wordcount-handler:latest
+    command: ["echo", "Wordcount handler built"]

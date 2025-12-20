@@ -22,6 +22,11 @@ struct ThumbnailRequest {
     size: u32,
 }
 
+#[derive(Deserialize)]
+struct WordCountRequest {
+    text: String,
+}
+
 #[derive(Serialize)]
 struct QueueResponse {
     task_id: String,
@@ -65,6 +70,12 @@ async fn thumbnail(Json(req): Json<ThumbnailRequest>) -> Json<QueueResponse> {
         "size": req.size
     });
     let task_id = queue_task("thumbnail", data).await.unwrap_or_default();
+    Json(QueueResponse { task_id })
+}
+
+async fn wordcount(Json(req): Json<WordCountRequest>) -> Json<QueueResponse> {
+    let data = serde_json::json!({"text": req.text});
+    let task_id = queue_task("wordcount", data).await.unwrap_or_default();
     Json(QueueResponse { task_id })
 }
 
@@ -113,6 +124,7 @@ async fn main() {
     let app = Router::new()
         .route("/resize", post(resize))
         .route("/thumbnail", post(thumbnail))
+        .route("/wordcount", post(wordcount))
         .route("/tasks/:id", get(get_task))
         .route("/images/:task_id", get(get_image));
 

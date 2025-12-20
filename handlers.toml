@@ -7,3 +7,8 @@ timeout = 60
 image = "image-handler:latest"
 instances = 2
 timeout = 30
+
+[handlers.wordcount]
+image = "wordcount-handler:latest"
+instances = 2
+timeout = 10

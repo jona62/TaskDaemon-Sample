@@ -8,9 +8,10 @@ A sample Rust web service that offloads CPU-intensive image processing to Python
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │   Rust API      │────▶│   TaskDaemon    │────▶│  Python Handler │
 │   (Axum)        │     │   (Queue)       │     │  (Pillow)       │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-     POST /resize            Queue task           Resize image
-     POST /thumbnail         Process async        Generate thumbnail
+└─────────────────┘     └─────────────────┘     ├─────────────────┤
+     POST /resize            Queue task         │  C++ Handler    │
+     POST /thumbnail         Process async      │  (Word Count)   │
+     POST /wordcount                            └─────────────────┘
 ```
 
 ## Quick Start
@@ -36,8 +37,16 @@ curl -X POST http://localhost:8080/thumbnail \
   -H "Content-Type: application/json" \
   -d '{"image_url": "https://example.com/photo.jpg", "size": 150}'
 
+# Word count (C++ handler)
+curl -X POST http://localhost:8080/wordcount \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Hello world from TaskDaemon"}'
+
 # Check task status
 curl http://localhost:8080/tasks/{task_id}
+
+# Download processed image
+curl -o output.png http://localhost:8080/images/{task_id}
 ```
 
 ## Project Structure
