@@ -22,6 +22,8 @@ services:
       - handler-build
 
   handler-build:
-    build: ./handlers
+    build:
+      context: .
+      dockerfile: handlers/Dockerfile
     image: image-handler:latest
     command: ["echo", "Handler image built"]
