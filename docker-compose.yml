@@ -35,7 +35,7 @@ services:
 
   wordcount-build:
     build:
-      context: ./handlers
-      dockerfile: Dockerfile.wordcount
+      context: .
+      dockerfile: handlers/Dockerfile.wordcount
     image: wordcount-handler:latest
     command: ["echo", "Wordcount handler built"]
