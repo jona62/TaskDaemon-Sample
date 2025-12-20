@@ -27,11 +27,15 @@ services:
       - wordcount-handler
 
   image-handler:
-    build: ./handlers/image
+    build:
+      context: .
+      dockerfile: handlers/image/Dockerfile
     image: image-handler:latest
     command: ["echo", "Image handler built"]
 
   wordcount-handler:
-    build: ./handlers/wordcount
+    build:
+      context: .
+      dockerfile: handlers/wordcount/Dockerfile
     image: wordcount-handler:latest
     command: ["echo", "Wordcount handler built"]
