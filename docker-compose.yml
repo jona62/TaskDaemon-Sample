@@ -23,19 +23,15 @@ services:
       - HANDLER_CONFIG=/app/handlers.toml
       - DAEMON_WORKERS=4
     depends_on:
-      - handler-build
-      - wordcount-build
+      - image-handler
+      - wordcount-handler
 
-  handler-build:
-    build:
-      context: .
-      dockerfile: handlers/Dockerfile
+  image-handler:
+    build: ./handlers/image
     image: image-handler:latest
-    command: ["echo", "Handler image built"]
+    command: ["echo", "Image handler built"]
 
-  wordcount-build:
-    build:
-      context: .
-      dockerfile: handlers/Dockerfile.wordcount
+  wordcount-handler:
+    build: ./handlers/wordcount
     image: wordcount-handler:latest
     command: ["echo", "Wordcount handler built"]
