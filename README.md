@@ -46,6 +46,30 @@ curl http://localhost:8080/tasks/{task_id}
 taskdaemon-sample/
 ├── api/                 # Rust web API
 ├── handlers/            # Python image processing handlers
+├── libs/                # Git submodules
+│   └── taskdaemon-handlers/  # Handler SDKs
 ├── docker-compose.yml
 └── README.md
+```
+
+## Cloning
+
+```bash
+git clone --recurse-submodules https://github.com/youruser/taskdaemon-sample.git
+```
+
+Or if already cloned:
+
+```bash
+git submodule update --init --recursive
+```
+
+## Updating the SDK Submodule
+
+```bash
+cd libs/taskdaemon-handlers
+git pull origin main
+cd ../..
+git add libs/taskdaemon-handlers
+git commit -m "chore: update taskdaemon-handlers submodule"
 ```
