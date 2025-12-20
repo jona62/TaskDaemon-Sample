@@ -1,6 +1,13 @@
-# Image Processing Service
+# TaskDaemon Sample
 
-A sample Rust web service that offloads CPU-intensive image processing to Python handlers via TaskDaemon.
+A sample project demonstrating [TaskDaemon](https://github.com/jona62/TaskDaemon) with Python and C++ handlers.
+
+## What This Demonstrates
+
+- Rust API service queuing tasks to TaskDaemon
+- Python handler for image processing (resize, thumbnail)
+- C++ handler for text processing (word count)
+- Handler SDKs from [TaskDaemon-Handlers](https://github.com/jona62/TaskDaemon-Handlers)
 
 ## Architecture
 
@@ -17,6 +24,8 @@ A sample Rust web service that offloads CPU-intensive image processing to Python
 ## Quick Start
 
 ```bash
+git clone --recurse-submodules https://github.com/jona62/TaskDaemon-Sample.git
+cd TaskDaemon-Sample
 docker compose up --build
 ```
 
@@ -30,12 +39,12 @@ Services:
 # Resize an image
 curl -X POST http://localhost:8080/resize \
   -H "Content-Type: application/json" \
-  -d '{"image_url": "https://example.com/photo.jpg", "width": 800, "height": 600}'
+  -d '{"image_url": "https://picsum.photos/400", "width": 200, "height": 200}'
 
 # Generate thumbnail
 curl -X POST http://localhost:8080/thumbnail \
   -H "Content-Type: application/json" \
-  -d '{"image_url": "https://example.com/photo.jpg", "size": 150}'
+  -d '{"image_url": "https://picsum.photos/400", "size": 100}'
 
 # Word count (C++ handler)
 curl -X POST http://localhost:8080/wordcount \
@@ -53,18 +62,27 @@ curl -o output.png http://localhost:8080/images/{task_id}
 
 ```
 taskdaemon-sample/
-├── api/                 # Rust web API
-├── handlers/            # Task handlers
-│   ├── image/           # Python image processing
-│   └── wordcount/       # C++ word count
-├── libs/                # Git submodules
-│   ├── task-daemon/     # TaskDaemon server
+├── api/                      # Rust web API (Axum)
+│   └── src/main.rs
+├── handlers/
+│   ├── image/                # Python image handler
+│   │   ├── Dockerfile
+│   │   └── image_handler.py
+│   └── wordcount/            # C++ word count handler
+│       ├── Dockerfile
+│       └── wordcount.cpp
+├── libs/                     # Git submodules
+│   ├── task-daemon/          # TaskDaemon server
 │   └── taskdaemon-handlers/  # Handler SDKs
-├── docker-compose.yml
-└── README.md
+├── handlers.toml             # Handler configuration
+└── docker-compose.yml
 ```
 
-## Cloning
+## Submodules
+
+This project uses git submodules for TaskDaemon and Handler SDKs.
+
+### Cloning
 
 ```bash
 git clone --recurse-submodules https://github.com/jona62/TaskDaemon-Sample.git
@@ -76,10 +94,25 @@ Or if already cloned:
 git submodule update --init --recursive
 ```
 
-## Updating Submodules
+### Updating
 
 ```bash
 git submodule update --remote --merge
 git add libs/
 git commit -m "chore: update submodules"
 ```
+
+### If submodule has local changes
+
+```bash
+cd libs/task-daemon
+git checkout .
+git clean -fd
+cd ../..
+git submodule update --remote --merge
+```
+
+## Related
+
+- [TaskDaemon](https://github.com/jona62/TaskDaemon) - The task processing daemon
+- [TaskDaemon-Handlers](https://github.com/jona62/TaskDaemon-Handlers) - Handler SDKs for all languages
