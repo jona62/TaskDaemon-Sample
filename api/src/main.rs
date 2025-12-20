@@ -65,13 +65,14 @@ async fn get_task(Path(task_id): Path<String>) -> Json<serde_json::Value> {
     let daemon_url = env::var("TASKDAEMON_URL").unwrap_or_else(|_| "http://localhost:3000".into());
     let client = reqwest::Client::new();
     
-    let resp = client
+    let resp = match client
         .get(format!("{}/api/tasks/{}", daemon_url, task_id))
         .send()
         .await
-        .ok()
-        .and_then(|r| futures::executor::block_on(r.json()).ok())
-        .unwrap_or(serde_json::json!({"error": "not found"}));
+    {
+        Ok(r) => r.json().await.unwrap_or(serde_json::json!({"error": "parse error"})),
+        Err(_) => serde_json::json!({"error": "not found"}),
+    };
     
     Json(resp)
 }
@@ -81,7 +82,7 @@ async fn main() {
     let app = Router::new()
         .route("/resize", post(resize))
         .route("/thumbnail", post(thumbnail))
-        .route("/tasks/:id", get(get_task));
+        .route("/tasks/{id}", get(get_task));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
     println!("API listening on http://0.0.0.0:8080");

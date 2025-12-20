@@ -1,6 +1,8 @@
 services:
   api:
-    build: ./api
+    build:
+      context: .
+      dockerfile: api/Dockerfile
     ports:
       - "8080:8080"
     environment:
@@ -9,7 +11,9 @@ services:
       - taskdaemon
 
   taskdaemon:
-    image: ghcr.io/jona62/task-daemon:latest
+    build:
+      context: ../task-daemon-rust
+      dockerfile: crates/task-daemon-examples/Dockerfile
     ports:
       - "3000:3000"
     volumes:
