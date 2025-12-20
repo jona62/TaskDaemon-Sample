@@ -1,3 +1,4 @@
+import base64
 from io import BytesIO
 import requests
 from PIL import Image
@@ -16,14 +17,15 @@ def handler(task: Task) -> Success | Error:
         size = data["size"]
         img.thumbnail((size, size), Image.LANCZOS)
     
-    # Save to buffer
+    # Encode as base64
     buffer = BytesIO()
     img.save(buffer, format="PNG")
+    b64 = base64.b64encode(buffer.getvalue()).decode()
     
     return Success({
-        "status": "processed",
-        "original_size": [img.width, img.height],
-        "bytes": len(buffer.getvalue())
+        "size": [img.width, img.height],
+        "format": "png",
+        "data": b64
     })
 
 if __name__ == "__main__":
