@@ -1,0 +1,27 @@
+services:
+  api:
+    build: ./api
+    ports:
+      - "8080:8080"
+    environment:
+      - TASKDAEMON_URL=http://taskdaemon:3000
+    depends_on:
+      - taskdaemon
+
+  taskdaemon:
+    image: ghcr.io/jona62/task-daemon:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./handlers.toml:/app/handlers.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - HANDLER_CONFIG=/app/handlers.toml
+      - DAEMON_WORKERS=4
+    depends_on:
+      - handler-build
+
+  handler-build:
+    build: ./handlers
+    image: image-handler:latest
+    command: ["echo", "Handler image built"]

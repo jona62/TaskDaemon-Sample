@@ -1,0 +1,9 @@
+[handlers.resize]
+image = "image-handler:latest"
+instances = 2
+timeout = 60
+
+[handlers.thumbnail]
+image = "image-handler:latest"
+instances = 2
+timeout = 30
