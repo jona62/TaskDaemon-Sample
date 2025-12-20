@@ -58,11 +58,15 @@ taskdaemon-sample/
 │   ├── image/           # Python image processing
 │   └── wordcount/       # C++ word count
 ├── libs/                # Git submodules
-│   ├── task-daemon/     # TaskDaemon server
 │   └── taskdaemon-handlers/  # Handler SDKs
 ├── docker-compose.yml
 └── README.md
 ```
+
+## Prerequisites
+
+- Docker
+- [TaskDaemon](https://github.com/jona62/TaskDaemon) cloned as sibling directory (`../task-daemon-rust`)
 
 ## Cloning
 

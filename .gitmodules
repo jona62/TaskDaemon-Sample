@@ -1,6 +1,3 @@
 [submodule "libs/taskdaemon-handlers"]
 	path = libs/taskdaemon-handlers
 	url = https://github.com/jona62/TaskDaemon-Handlers.git
-[submodule "libs/task-daemon"]
-	path = libs/task-daemon
-	url = https://github.com/jona62/TaskDaemon.git

@@ -12,7 +12,7 @@ services:
 
   taskdaemon:
     build:
-      context: ./libs/task-daemon
+      context: ../task-daemon-rust
       dockerfile: crates/task-daemon-examples/Dockerfile
     ports:
       - "3000:3000"
