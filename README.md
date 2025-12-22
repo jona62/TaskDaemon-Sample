@@ -33,6 +33,16 @@ Services:
 - API: http://localhost:8080
 - TaskDaemon: http://localhost:3000
 
+### With Monitoring
+
+```bash
+docker compose --profile monitoring up --build
+```
+
+Additional services:
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3001 (admin/admin)
+
 ## Usage
 
 ```bash
