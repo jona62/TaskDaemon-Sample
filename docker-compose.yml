@@ -21,7 +21,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - HANDLER_CONFIG=/app/handlers.toml
-      - DAEMON_WORKERS=4
+      - DAEMON_WORKERS=30
+      - DAEMON_LOG_LEVEL=info
     depends_on:
       - prime-handler
 
