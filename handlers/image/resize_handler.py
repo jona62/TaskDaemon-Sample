@@ -3,20 +3,20 @@ from io import BytesIO
 import requests
 from PIL import Image
 from taskdaemon import run, Task, Success, Error
+from logging import Logger
+logger = Logger("resize_handler")
+logger.setLevel("DEBUG")
 
-def handler(task: Task) -> Success | Error:
+def resize(task: Task) -> Success | Error:
+    logger.debug(f"Received task: {task}\nResizing image: {task.task_data['image_url']}")
     data = task.task_data
     
     # Download image
     resp = requests.get(data["image_url"], timeout=30)
     img = Image.open(BytesIO(resp.content))
     
-    if task.task_type == "resize":
-        img = img.resize((data["width"], data["height"]), Image.LANCZOS)
-    elif task.task_type == "thumbnail":
-        size = data["size"]
-        img.thumbnail((size, size), Image.LANCZOS)
-    
+    img = img.resize((data["width"], data["height"]), Image.LANCZOS)
+
     # Encode as base64
     buffer = BytesIO()
     img.save(buffer, format="PNG")
@@ -29,4 +29,4 @@ def handler(task: Task) -> Success | Error:
     })
 
 if __name__ == "__main__":
-    run(handler)
+    run(resize)

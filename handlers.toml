@@ -1,14 +1,4 @@
 [handlers.resize]
-image = "image-handler:latest"
-instances = 2
+image = "resize-handler:latest"
+instances = 4
 timeout = 60
-
-[handlers.thumbnail]
-image = "image-handler:latest"
-instances = 2
-timeout = 30
-
-[handlers.wordcount]
-image = "wordcount-handler:latest"
-instances = 2
-timeout = 10
