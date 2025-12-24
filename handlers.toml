@@ -1,4 +1,4 @@
-[handlers.resize]
-image = "resize-handler:latest"
+[handlers.prime]
+image = "prime-handler:latest"
 instances = 4
-timeout = 60
+timeout = 10

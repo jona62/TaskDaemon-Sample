@@ -1,24 +1,15 @@
 # TaskDaemon Sample
 
-A sample project demonstrating [TaskDaemon](https://github.com/jona62/TaskDaemon) with Python and C++ handlers.
-
-## What This Demonstrates
-
-- Rust API service queuing tasks to TaskDaemon
-- Python handler for image processing (resize, thumbnail)
-- C++ handler for text processing (word count)
-- Handler SDKs from [TaskDaemon-Handlers](https://github.com/jona62/TaskDaemon-Handlers)
+A sample project demonstrating [TaskDaemon](https://github.com/jona62/TaskDaemon) with a C++ handler for computing prime numbers.
 
 ## Architecture
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Rust API      │────▶│   TaskDaemon    │────▶│  Python Handler │
-│   (Axum)        │     │   (Queue)       │     │  (Pillow)       │
-└─────────────────┘     └─────────────────┘     ├─────────────────┤
-     POST /resize            Queue task         │  C++ Handler    │
-     POST /thumbnail         Process async      │  (Word Count)   │
-     POST /wordcount                            └─────────────────┘
+│   Rust API      │────▶│   TaskDaemon    │────▶│  C++ Handler    │
+│   (Axum)        │     │   (Queue)       │     │  (Prime Sieve)  │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+     POST /prime             Queue task          Compute primes
 ```
 
 ## Quick Start
@@ -33,39 +24,38 @@ Services:
 - API: http://localhost:8080
 - TaskDaemon: http://localhost:3030
 
-### With Monitoring
-
-```bash
-docker compose --profile monitoring up --build
-```
-
-Additional services:
-- Prometheus: http://localhost:9090
-- Grafana: http://localhost:3001 (admin/admin)
-
 ## Usage
 
 ```bash
-# Resize an image
-curl -X POST http://localhost:8080/resize \
+# Find all primes up to 10 million
+curl -X POST http://localhost:8080/prime \
   -H "Content-Type: application/json" \
-  -d '{"image_url": "https://picsum.photos/400", "width": 200, "height": 200}'
+  -d '{"limit": 10000000}'
+```
 
-# Generate thumbnail
-curl -X POST http://localhost:8080/thumbnail \
-  -H "Content-Type: application/json" \
-  -d '{"image_url": "https://picsum.photos/400", "size": 100}'
+Response:
+```json
+{
+  "task_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
 
-# Word count (C++ handler)
-curl -X POST http://localhost:8080/wordcount \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Hello world from TaskDaemon"}'
+## Handler
 
-# Check task status
-curl http://localhost:8080/tasks/{task_id}
+The C++ handler uses the [TaskDaemon C++ SDK](https://github.com/jona62/TaskDaemon-Handlers) and the Sieve of Eratosthenes algorithm to find prime numbers. Computing primes up to 10 million takes ~100ms, making it ideal for demonstrating concurrent task processing.
 
-# Download processed image
-curl -o output.png http://localhost:8080/images/{task_id}
+```cpp
+#include "taskdaemon.hpp"
+
+Result handle(const Task& task) {
+    int limit = task.task_data.value("limit", 1000000);
+    auto primes = sieve_primes(limit);
+    return success({{"count", primes.size()}});
+}
+
+int main() {
+    run(handle);
+}
 ```
 
 ## Project Structure
@@ -75,51 +65,13 @@ taskdaemon-sample/
 ├── api/                      # Rust web API (Axum)
 │   └── src/main.rs
 ├── handlers/
-│   ├── image/                # Python image handler
-│   │   ├── Dockerfile
-│   │   └── image_handler.py
-│   └── wordcount/            # C++ word count handler
+│   └── prime/                # C++ prime number handler
 │       ├── Dockerfile
-│       └── wordcount.cpp
+│       └── prime.cpp
 ├── libs/                     # Git submodules
-│   ├── task-daemon/          # TaskDaemon server
-│   └── taskdaemon-handlers/  # Handler SDKs
+│   └── task-daemon/
 ├── handlers.toml             # Handler configuration
 └── docker-compose.yml
-```
-
-## Submodules
-
-This project uses git submodules for TaskDaemon and Handler SDKs.
-
-### Cloning
-
-```bash
-git clone --recurse-submodules https://github.com/jona62/TaskDaemon-Sample.git
-```
-
-Or if already cloned:
-
-```bash
-git submodule update --init --recursive
-```
-
-### Updating
-
-```bash
-git submodule update --remote --merge
-git add libs/
-git commit -m "chore: update submodules"
-```
-
-### If submodule has local changes
-
-```bash
-cd libs/task-daemon
-git checkout .
-git clean -fd
-cd ../..
-git submodule update --remote --merge
 ```
 
 ## Related

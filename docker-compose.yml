@@ -23,14 +23,14 @@ services:
       - HANDLER_CONFIG=/app/handlers.toml
       - DAEMON_WORKERS=4
     depends_on:
-      - resize-handler
+      - prime-handler
 
-  resize-handler:
+  prime-handler:
     build:
-      context: .
-      dockerfile: handlers/image/Dockerfile
-    image: resize-handler:latest
-    command: ["echo", "Resize image handler built"]
+      context: ./handlers/prime
+      dockerfile: Dockerfile
+    image: prime-handler:latest
+    command: ["echo", "Prime handler built"]
 
   prometheus:
     image: prom/prometheus:latest
