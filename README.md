@@ -31,7 +31,7 @@ docker compose up --build
 
 Services:
 - API: http://localhost:8080
-- TaskDaemon: http://localhost:3000
+- TaskDaemon: http://localhost:3030
 
 ### With Monitoring
 
