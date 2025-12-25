@@ -1,0 +1,57 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - TASKDAEMON_URL=http://taskdaemon:8080
+    depends_on:
+      - taskdaemon
+
+  taskdaemon:
+    build:
+      context: ./libs/task-daemon
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./handlers.toml:/app/handlers.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - HANDLER_CONFIG=/app/handlers.toml
+      - DAEMON_DB_MAX_CONNECTIONS=50
+      - DAEMON_WORKERS=100
+      - DAEMON_LOG_LEVEL=info
+      - DAEMON_QUEUE_TYPE=hybrid
+      - DAEMON_TASK_SELECTION=priority
+    depends_on:
+      - prime-handler
+
+  prime-handler:
+    build:
+      context: ./handlers/prime
+      dockerfile: Dockerfile
+    image: prime-handler:latest
+    command: ["echo", "Prime handler built"]
+
+  prometheus:
+    image: prom/prometheus:latest
+    profiles: ["monitoring"]
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - taskdaemon
+
+  grafana:
+    image: grafana/grafana:latest
+    profiles: ["monitoring"]
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
