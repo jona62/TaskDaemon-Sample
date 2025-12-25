@@ -1,6 +1,6 @@
 # TaskDaemon Sample
 
-A sample project demonstrating [TaskDaemon](https://github.com/jona62/TaskDaemon) with a C++ handler for computing prime numbers.
+A sample project demonstrating [TaskDaemon](https://hub.docker.com/r/mshelia/taskdaemon) with a C++ handler for computing prime numbers.
 
 ## Architecture
 
@@ -15,9 +15,9 @@ A sample project demonstrating [TaskDaemon](https://github.com/jona62/TaskDaemon
 ## Quick Start
 
 ```bash
-git clone --recurse-submodules https://github.com/jona62/TaskDaemon-Sample.git
+git clone https://github.com/jona62/TaskDaemon-Sample.git
 cd TaskDaemon-Sample
-docker compose up --build
+docker compose up
 ```
 
 Services:
@@ -26,6 +26,16 @@ Services:
 - TaskDaemon: http://localhost:8080
 - Metrics: http://localhost:8080/metrics
 
+### Local Development
+
+To build TaskDaemon from source (requires submodule access):
+
+```bash
+git clone --recurse-submodules https://github.com/jona62/TaskDaemon-Sample.git
+cd TaskDaemon-Sample
+docker compose -f docker-compose.local.yml up --build
+```
+
 ## Usage
 
 ```bash
@@ -33,6 +43,11 @@ Services:
 curl -X POST http://localhost:8081/prime \
   -H "Content-Type: application/json" \
   -d '{"limit": 10000000}'
+
+# With priority (when using priority task selection)
+curl -X POST http://localhost:8081/prime \
+  -H "Content-Type: application/json" \
+  -d '{"limit": 10000000, "priority": 100}'
 ```
 
 Response:
@@ -52,13 +67,14 @@ Response:
 image = "prime-handler:latest"
 instances = 100                    # Number of container instances
 timeout = 10                       # Task timeout in seconds
-handler_selection = "round-robin"     # or "first-available"
+handler_selection = "round-robin"  # or "first-available", "random"
 ```
 
 ### docker-compose.yml
 
 ```yaml
 taskdaemon:
+  image: mshelia/taskdaemon:latest
   environment:
     - DAEMON_WORKERS=100           # Worker threads
     - DAEMON_QUEUE_TYPE=hybrid     # In-memory queue with SQLite persistence
@@ -94,13 +110,12 @@ taskdaemon-sample/
 │   └── prime/                # C++ prime number handler
 │       ├── Dockerfile
 │       └── prime.cpp
-├── libs/                     # Git submodules
-│   └── task-daemon/
 ├── handlers.toml             # Handler configuration
-└── docker-compose.yml
+├── docker-compose.yml        # Uses Docker Hub image
+└── docker-compose.local.yml  # Builds from source
 ```
 
 ## Related
 
-- [TaskDaemon](https://github.com/jona62/TaskDaemon) - The task processing daemon
+- [TaskDaemon on Docker Hub](https://hub.docker.com/r/mshelia/taskdaemon)
 - [TaskDaemon-Handlers](https://github.com/jona62/TaskDaemon-Handlers) - Handler SDKs for all languages
