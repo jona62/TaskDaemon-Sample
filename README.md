@@ -21,6 +21,7 @@ docker compose up --build
 ```
 
 Services:
+
 - API: http://localhost:8081
 - TaskDaemon: http://localhost:8080
 - Metrics: http://localhost:8080/metrics
@@ -35,6 +36,7 @@ curl -X POST http://localhost:8081/prime \
 ```
 
 Response:
+
 ```json
 {
   "task_id": "550e8400-e29b-41d4-a716-446655440000"
@@ -50,7 +52,7 @@ Response:
 image = "prime-handler:latest"
 instances = 100                    # Number of container instances
 timeout = 10                       # Task timeout in seconds
-handler_selection = "round-robin"  # or "first-available"
+handler_selection = "round-robin"     # or "first-available"
 ```
 
 ### docker-compose.yml
