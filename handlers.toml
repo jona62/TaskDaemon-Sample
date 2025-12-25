@@ -1,4 +1,4 @@
 [handlers.prime]
 image = "prime-handler:latest"
-instances = 4
+instances = 50
 timeout = 10

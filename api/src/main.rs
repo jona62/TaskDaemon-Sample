@@ -58,7 +58,7 @@ async fn prime(
 
 #[tokio::main]
 async fn main() {
-    let daemon_url = env::var("TASKDAEMON_URL").unwrap_or_else(|_| "http://localhost:3030".into());
+    let daemon_url = env::var("TASKDAEMON_URL").unwrap_or_else(|_| "http://localhost:8080".into());
 
     let state = Arc::new(AppState {
         daemon_url,
@@ -70,7 +70,7 @@ async fn main() {
         .route("/prime", post(prime))
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
-    println!("API listening on :8080");
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:8081").await.unwrap();
+    println!("API listening on :8081");
     axum::serve(listener, app).await.unwrap();
 }

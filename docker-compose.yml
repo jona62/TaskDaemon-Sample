@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: api/Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8081"
     environment:
       - TASKDAEMON_URL=http://taskdaemon:8080
     depends_on:
@@ -15,13 +15,13 @@ services:
       context: ./libs/task-daemon
       dockerfile: Dockerfile
     ports:
-      - "3030:8080"
+      - "8080:8080"
     volumes:
       - ./handlers.toml:/app/handlers.toml
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - HANDLER_CONFIG=/app/handlers.toml
-      - DAEMON_WORKERS=30
+      - DAEMON_WORKERS=55
       - DAEMON_LOG_LEVEL=info
     depends_on:
       - prime-handler
