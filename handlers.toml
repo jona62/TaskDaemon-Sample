@@ -1,4 +1,5 @@
 [handlers.prime]
 image = "prime-handler:latest"
-instances = 50
+instances = 100
 timeout = 10
+handler_selection = "round-robin"  # or "first-available"

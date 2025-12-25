@@ -21,14 +21,15 @@ docker compose up --build
 ```
 
 Services:
-- API: http://localhost:8080
-- TaskDaemon: http://localhost:3030
+- API: http://localhost:8081
+- TaskDaemon: http://localhost:8080
+- Metrics: http://localhost:8080/metrics
 
 ## Usage
 
 ```bash
 # Find all primes up to 10 million
-curl -X POST http://localhost:8080/prime \
+curl -X POST http://localhost:8081/prime \
   -H "Content-Type: application/json" \
   -d '{"limit": 10000000}'
 ```
@@ -38,6 +39,29 @@ Response:
 {
   "task_id": "550e8400-e29b-41d4-a716-446655440000"
 }
+```
+
+## Configuration
+
+### handlers.toml
+
+```toml
+[handlers.prime]
+image = "prime-handler:latest"
+instances = 100                    # Number of container instances
+timeout = 10                       # Task timeout in seconds
+handler_selection = "round-robin"  # or "first-available"
+```
+
+### docker-compose.yml
+
+```yaml
+taskdaemon:
+  environment:
+    - DAEMON_WORKERS=100           # Worker threads
+    - DAEMON_QUEUE_TYPE=hybrid     # In-memory queue with SQLite persistence
+    - DAEMON_TASK_SELECTION=fifo   # Task ordering: fifo, lifo, priority
+    - DAEMON_DB_MAX_CONNECTIONS=50 # SQLite connection pool
 ```
 
 ## Handler

@@ -21,8 +21,11 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - HANDLER_CONFIG=/app/handlers.toml
-      - DAEMON_WORKERS=55
+      - DAEMON_DB_MAX_CONNECTIONS=50 # Routes which the minions take to the task
+      - DAEMON_WORKERS=100 # Minions which execute the tasks
       - DAEMON_LOG_LEVEL=info
+      - DAEMON_QUEUE_TYPE=hybrid # In memory queue backed by a light weight database
+      - DAEMON_TASK_SELECTION=fifo # Order of task processing
     depends_on:
       - prime-handler
 
