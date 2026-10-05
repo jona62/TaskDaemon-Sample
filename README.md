@@ -20,6 +20,8 @@ The Docker Hub workflow uses the C++ SDK header already included in this sample 
 git submodule update --init libs/taskdaemon-handlers
 ```
 
+The included C++ header matches SDK release `v0.1.2`, which is pinned by `libs/taskdaemon-handlers`.
+
 Services are published on loopback:
 
 - Sample API: http://localhost:8081
