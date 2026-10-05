@@ -1,5 +1,6 @@
 [handlers.prime]
 image = "prime-handler:latest"
-instances = 100
-timeout = 10
+instances = 4
+memory_limit = "64m"
+# Omitted timeout inherits DAEMON_TASK_TIMEOUT (30 seconds by default).
 handler_selection = "round-robin"  # or "first-available"

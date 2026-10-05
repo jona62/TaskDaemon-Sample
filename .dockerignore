@@ -1,0 +1,7 @@
+# The root build context is used only by the sample API image.
+*
+!api
+!api/**
+api/target
+api/.env
+api/.DS_Store

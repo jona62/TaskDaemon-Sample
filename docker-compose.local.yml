@@ -4,30 +4,51 @@ services:
       context: .
       dockerfile: api/Dockerfile
     ports:
-      - "8081:8081"
+      - "127.0.0.1:${SAMPLE_API_PORT:-8081}:8081"
     environment:
       - TASKDAEMON_URL=http://taskdaemon:8080
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8081/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
     depends_on:
-      - taskdaemon
+      taskdaemon:
+        condition: service_healthy
 
   taskdaemon:
     build:
       context: ./libs/task-daemon
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "127.0.0.1:${TASKDAEMON_HTTP_PORT:-8080}:8080"
+      - "127.0.0.1:${TASKDAEMON_GRPC_PORT:-50051}:50051"
     volumes:
-      - ./handlers.toml:/app/handlers.toml
+      - ./handlers.toml:/app/handlers.toml:ro
       - /var/run/docker.sock:/var/run/docker.sock
+      - taskdaemon-data:/data
     environment:
       - HANDLER_CONFIG=/app/handlers.toml
-      - DAEMON_DB_MAX_CONNECTIONS=50
-      - DAEMON_WORKERS=100
+      - DAEMON_DB_PATH=/data/task_queue.db
+      - DAEMON_DB_MAX_CONNECTIONS=${DAEMON_DB_MAX_CONNECTIONS:-20}
+      - DAEMON_WORKERS=${DAEMON_WORKERS:-4}
+      - DAEMON_BATCH_SIZE=${DAEMON_BATCH_SIZE:-5}
+      - DAEMON_HOST=0.0.0.0
+      - DAEMON_PORT=8080
+      - DAEMON_GRPC_PORT=50051
+      - DAEMON_TASK_TIMEOUT=${DAEMON_TASK_TIMEOUT:-30}
+      - DAEMON_MAX_RETRIES=${DAEMON_MAX_RETRIES:-3}
       - DAEMON_LOG_LEVEL=info
-      - DAEMON_QUEUE_TYPE=hybrid
-      - DAEMON_TASK_SELECTION=priority
+      - DAEMON_QUEUE_TYPE=${DAEMON_QUEUE_TYPE:-hybrid}
+      - DAEMON_TASK_SELECTION=${DAEMON_TASK_SELECTION:-fifo}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health | grep -q '\"status\":\"healthy\"'"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
     depends_on:
-      - prime-handler
+      prime-handler:
+        condition: service_completed_successfully
 
   prime-handler:
     build:
@@ -40,7 +61,7 @@ services:
     image: prom/prometheus:latest
     profiles: ["monitoring"]
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     depends_on:
@@ -50,8 +71,11 @@ services:
     image: grafana/grafana:latest
     profiles: ["monitoring"]
     ports:
-      - "3001:3000"
+      - "127.0.0.1:3001:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     depends_on:
       - prometheus
+
+volumes:
+  taskdaemon-data:
